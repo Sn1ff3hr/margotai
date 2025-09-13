@@ -4,6 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src-elem 'self' https://cdnjs.cloudflare.com 'nonce-2726c7f26c'; style-src-attr 'unsafe-inline'; script-src 'self' 'nonce-2726c7f26c'; font-src 'self' https://cdnjs.cloudflare.com;" />
+  <meta name="description" content="Marxia Cafe y Bocaditos ordering app" />
+  <meta name="robots" content="index,follow" />
+  <meta http-equiv="Referrer-Policy" content="no-referrer" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="theme-color" content="#6f7dff" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" hreflang="en" href="index.html?lang=en" />
+  <link rel="alternate" hreflang="es" href="index.html?lang=es" />
   <title>Marxia Cafe y Bocaditos</title>
   <!-- Removed external Font Awesome dependency; using Unicode icons instead for broader compatibility -->
   <style nonce="2726c7f26c">
@@ -56,6 +65,11 @@
       font-size:14px;font-weight:700;box-shadow:var(--shadow);line-height:1;
     }
     .btn.alt{background:var(--accent-2)}
+
+    .cookie-banner{position:fixed;bottom:0;left:0;right:0;padding:10px;display:flex;justify-content:center;align-items:center;gap:10px;background:var(--card);color:var(--ink);box-shadow:0 -2px 8px rgba(0,0,0,.2);font-size:.9rem;z-index:1000}
+    .cookie-banner button{all:unset;cursor:pointer;background:var(--accent);color:#fff;padding:6px 12px;border-radius:6px;font-weight:700}
+    html[data-theme="light"] .cookie-banner{background:var(--card-light);color:var(--ink-light);box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+    html[data-theme="light"] .cookie-banner button{background:var(--accent)}
 
     /* Carousel */
     .carousel{position:relative;margin-top:50px;margin-bottom:var(--section-gap)}
@@ -165,7 +179,7 @@
 </head>
 <body>
   <div class="wrap">
-    <header>
+    <header role="banner">
       <div class="brand" data-en="Marxia Cafe y Bocaditos" data-es="Marxia Cafe y Bocaditos">Marxia Cafe y Bocaditos</div>
       <div class="actions">
         <button id="langBtn" class="toggle" aria-label="Toggle Language">ES</button>
@@ -173,6 +187,7 @@
       </div>
     </header>
 
+    <main role="main">
     <!-- PRODUCT CAROUSEL -->
     <section class="carousel">
       <div class="arrow left"><button id="prev" aria-label="Previous">‹</button></div>
@@ -267,13 +282,14 @@
 
         <div class="hr"></div>
         <div class="muted" data-en="Delivery Time" data-es="Tiempo de entrega">Delivery Time</div>
-        <div class="chips" id="delTimes" style="margin-top:10px">
+      <div class="chips" id="delTimes" style="margin-top:10px">
           <button class="chip sel" data-min="45">45 min</button>
           <button class="chip" data-min="60">1 hr</button>
           <button class="chip" data-min="90">1 hr 30 min</button>
         </div>
       </div>
     </section>
+    </main>
   </div>
 
   <!-- FABs for Chat and Pay -->
@@ -339,11 +355,12 @@
     </div>
   </dialog>
 
+  <script nonce="2726c7f26c" src="config.js" integrity="sha384-Pet/KlYr4A5NXXhYEt/VB5cvYTny7+J2AIhlu680LQB2T8WcMAOhn5mzo6mChFE9" crossorigin="anonymous" data-check></script>
+  <script nonce="2726c7f26c" src="sw-register.js" integrity="sha384-F+61rrWkZLGuA6IQnoj0ep3wkTPooICNzyW9K5U0sdkpveXUjiEgsDmbSsQGV+4X" crossorigin="anonymous" data-check></script>
+  <script nonce="2726c7f26c" src="cookie-consent.js" integrity="sha384-GFaQeVTc8IPwd2qfWf+QDnSMFNiQccWd2gUenONZNPXRnwPwbUW9xEiSJIw4iVhj" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c">
     /* CONFIG */
-    const CLOUDFLARE_WORKER_URL = ""; // optional
-    const APPS_SCRIPT_URL = "";       // optional
-    const WHATSAPP_NUMBER = "593993516952";
+    const {CLOUDFLARE_WORKER_URL, APPS_SCRIPT_URL, WHATSAPP_NUMBER} = CONFIG;
     const BUSINESS = {
       name: "Marxia Cafe y Bocaditos",
       address: "Av. Principal y Calle A",
@@ -629,9 +646,13 @@
     // Keyboard arrows for carousel
     document.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft')scrollByCards(-1); if(e.key==='ArrowRight')scrollByCards(1); });
   </script>
-  <footer>
+  <footer role="contentinfo">
     <p><a href="privacy-policy.html">Privacy Policy</a> | <a href="cookie-policy.html">Cookie Policy</a></p>
   </footer>
+  <div id="cookieBanner" class="cookie-banner" hidden>
+    <p>We use cookies to improve your experience.</p>
+    <button id="acceptCookies">Accept</button>
+  </div>
   <script nonce="2726c7f26c" src="order-collector.js" integrity="sha384-qAmIuVt/AYOF9E04H5d35lpDculHPrKKccwRc8tXOEMVtqFTmQ40XSowFtgUjb45" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c" src="integrity-check.js" integrity="sha384-ivpJrx69d0FkMO7sr+9vbykWyWaKOL3HDkND0fwbXnUOsPcEbVugYSUkPh0hvrPn" crossorigin="anonymous" data-check></script>
 </body>

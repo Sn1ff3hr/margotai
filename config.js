@@ -1,0 +1,6 @@
+"use strict";
+const CONFIG = {
+  CLOUDFLARE_WORKER_URL: "",
+  APPS_SCRIPT_URL: "",
+  WHATSAPP_NUMBER: "593993516952"
+};

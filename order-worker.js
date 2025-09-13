@@ -1,7 +1,9 @@
+self.importScripts('config.js');
+
 self.addEventListener('message', async (e) => {
   const payload = e.data;
   if (!payload || typeof payload !== 'object') return;
-  const url = self.CLOUDFLARE_WORKER_URL || self.APPS_SCRIPT_URL || (self.location.origin + '/api/order');
+  const url = (CONFIG && (CONFIG.CLOUDFLARE_WORKER_URL || CONFIG.APPS_SCRIPT_URL)) || (self.location.origin + '/api/order');
   try {
     await fetch(url, {
       method: 'POST',
