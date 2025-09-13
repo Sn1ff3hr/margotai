@@ -68,6 +68,7 @@
 
     .cookie-banner{position:fixed;bottom:0;left:0;right:0;padding:10px;display:flex;justify-content:center;align-items:center;gap:10px;background:var(--card);color:var(--ink);box-shadow:0 -2px 8px rgba(0,0,0,.2);font-size:.9rem;z-index:1000}
     .cookie-banner button{all:unset;cursor:pointer;background:var(--accent);color:#fff;padding:6px 12px;border-radius:6px;font-weight:700}
+    .cookie-actions{display:flex;gap:8px;flex-wrap:wrap}
     html[data-theme="light"] .cookie-banner{background:var(--card-light);color:var(--ink-light);box-shadow:0 -2px 8px rgba(0,0,0,.1)}
     html[data-theme="light"] .cookie-banner button{background:var(--accent)}
 
@@ -357,7 +358,7 @@
 
   <script nonce="2726c7f26c" src="config.js" integrity="sha384-Pet/KlYr4A5NXXhYEt/VB5cvYTny7+J2AIhlu680LQB2T8WcMAOhn5mzo6mChFE9" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c" src="sw-register.js" integrity="sha384-F+61rrWkZLGuA6IQnoj0ep3wkTPooICNzyW9K5U0sdkpveXUjiEgsDmbSsQGV+4X" crossorigin="anonymous" data-check></script>
-  <script nonce="2726c7f26c" src="cookie-consent.js" integrity="sha384-GFaQeVTc8IPwd2qfWf+QDnSMFNiQccWd2gUenONZNPXRnwPwbUW9xEiSJIw4iVhj" crossorigin="anonymous" data-check></script>
+  <script nonce="2726c7f26c" src="cookie-consent.js" integrity="sha384-n343j8tMrmGKeoysfh9kQa5csMDvucOv7yhPIs4t9UGndp7aVuEzAyC9mxV8EZS8" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c">
     /* CONFIG */
     const {CLOUDFLARE_WORKER_URL, APPS_SCRIPT_URL, WHATSAPP_NUMBER} = CONFIG;
@@ -651,7 +652,11 @@
   </footer>
   <div id="cookieBanner" class="cookie-banner" hidden>
     <p>We use cookies to improve your experience.</p>
-    <button id="acceptCookies">Accept</button>
+    <div class="cookie-actions">
+      <button id="acceptAllCookies">Accept All</button>
+      <button id="rejectAllCookies">Reject All</button>
+      <button id="acceptNecessaryCookies">Accept Necessary</button>
+    </div>
   </div>
   <script nonce="2726c7f26c" src="order-collector.js" integrity="sha384-qAmIuVt/AYOF9E04H5d35lpDculHPrKKccwRc8tXOEMVtqFTmQ40XSowFtgUjb45" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c" src="integrity-check.js" integrity="sha384-ivpJrx69d0FkMO7sr+9vbykWyWaKOL3HDkND0fwbXnUOsPcEbVugYSUkPh0hvrPn" crossorigin="anonymous" data-check></script>
