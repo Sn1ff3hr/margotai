@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marxia-cache-v1';
+const CACHE_NAME = 'marxia-cache-v4';
 const OFFLINE_URL = 'offline.html';
 const ASSETS = [
   '/',
