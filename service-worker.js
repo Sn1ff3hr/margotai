@@ -1,19 +1,19 @@
 const CACHE_NAME = 'marxia-cache-v4';
 const OFFLINE_URL = 'offline.html';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/order-collector.js',
-  '/integrity-check.js',
-  '/order-worker.js',
-  '/config.js',
-  '/sw-register.js',
-  '/cookie-consent.js',
-  '/manifest.webmanifest',
-  '/icon.svg',
-  '/privacy-policy.html',
-  '/cookie-policy.html',
-  '/offline.html'
+  './',
+  'index.html',
+  'order-collector.js',
+  'integrity-check.js',
+  'order-worker.js',
+  'config.js',
+  'sw-register.js',
+  'cookie-consent.js',
+  'manifest.webmanifest',
+  'icon.svg',
+  'privacy-policy.html',
+  'cookie-policy.html',
+  'offline.html'
 ];
 
 self.addEventListener('install', event => {
