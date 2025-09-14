@@ -12,9 +12,9 @@
       localStorage.setItem('cookie-consent',value);
       banner.remove();
     }
-    acceptAll.addEventListener('click',()=>setConsent('all'));
-    rejectAll.addEventListener('click',()=>setConsent('none'));
-    acceptNecessary.addEventListener('click',()=>setConsent('necessary'));
+    acceptAll.addEventListener('click',ev=>{ev?.preventDefault();setConsent('all');});
+    rejectAll.addEventListener('click',ev=>{ev?.preventDefault();setConsent('none');});
+    acceptNecessary.addEventListener('click',ev=>{ev?.preventDefault();setConsent('necessary');});
   }
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',init);
