@@ -10,8 +10,6 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <meta name="theme-color" content="#6f7dff" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="alternate" hreflang="en" href="index.html?lang=en" />
-  <link rel="alternate" hreflang="es" href="index.html?lang=es" />
   <title>Marxia Cafe y Bocaditos</title>
   <!-- Removed external Font Awesome dependency; using Unicode icons instead for broader compatibility -->
   <style nonce="2726c7f26c">
@@ -47,8 +45,8 @@
 
     .wrap{max-width:1100px;margin:0 auto;padding:16px}
 
-    header{position:relative;display:flex;justify-content:center;align-items:center;margin-bottom:12px;min-height:44px}
-    .brand{font-weight:800;letter-spacing:.3px;text-align:center}
+    header{position:relative;display:flex;justify-content:center;align-items:center;margin-bottom:12px;min-height:44px;padding-top:24px}
+    .brand{font-weight:800;letter-spacing:.3px;text-align:center;font-size:36px;margin:0 auto;line-height:1.2}
     .actions{
       position:fixed;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;align-items:flex-end;z-index:1000;
     }
@@ -357,7 +355,8 @@
 
   <script nonce="2726c7f26c" src="config.js" integrity="sha384-Pet/KlYr4A5NXXhYEt/VB5cvYTny7+J2AIhlu680LQB2T8WcMAOhn5mzo6mChFE9" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c" src="sw-register.js" integrity="sha384-F+61rrWkZLGuA6IQnoj0ep3wkTPooICNzyW9K5U0sdkpveXUjiEgsDmbSsQGV+4X" crossorigin="anonymous" data-check></script>
-  <script nonce="2726c7f26c" src="cookie-consent.js" integrity="sha384-uYbPSRY0EDtc2fPaYTinOSGjZjHbIzMs4BmGA/a306kjX8kjlV5OwHxNgVfzGgTj" crossorigin="anonymous" data-check></script>
+  <script nonce="2726c7f26c" src="cookie-consent.js" integrity="sha384-m5s+Pc2ibpdTs90dpzob5NcmRX0lW7LFLZY7hQAaR7S0jHZ9k60xN3NELH1hzc5V" crossorigin="anonymous" data-check></script>
+  <script nonce="2726c7f26c" src="checkout.js" integrity="sha384-pllJO1ZkCoqYTe59KSQmPAfKhjv4mL6QD4OUBNNq6668H8EknsUGHZuWBe2b7Bqq" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c">
     /* CONFIG */
     const {CLOUDFLARE_WORKER_URL, APPS_SCRIPT_URL, WHATSAPP_NUMBER} = CONFIG;
@@ -365,8 +364,7 @@
       name: "Marxia Cafe y Bocaditos",
       address: "Av. Principal y Calle A",
       city: "Guayaquil",
-      contact: "+593 99 999 9999",
-      logo_url: ""
+      contact: "+593 99 999 9999"
     };
 
     /* DATA */
@@ -605,39 +603,57 @@
 
     // Submit to backend + WhatsApp
     $('#confirmBtn').addEventListener('click', async ()=>{
-      const firstName=$('#firstName').value.trim();
-      const lastName=$('#lastName').value.trim();
-      const idNumber=$('#idNumber').value.trim();
-      const phone=$('#phone').value.trim();
-      const email=$('#email').value.trim();
-      const address=$('#address').value.trim();
-      const instructions=$('#instructions').value.trim();
-      const emailOK=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      const phoneOK=/^\+?593\d{9,10}$/.test(phone)||/^0\d{8,9}$/.test(phone);
-      if(!firstName||!lastName||!idNumber||!phoneOK||!emailOK||!address){
-        alert(t('Please fill all fields with valid data (Name, Last name, Céd/RUC, EC phone, Email, Address).',
-                'Complete todos los campos con datos válidos (Nombre, Apellido, Céd/RUC, teléfono EC, Correo, Dirección).')); return;
-      }
-      const items=PRODUCTS.map(p=>({id:p.id,name:(lang==='en'?p.name_en:p.name_es),desc:(lang==='en'?p.desc_en:p.desc_es),qty:(cart.get(p.id)||0),unit:p.price})).filter(i=>i.qty>0);
-      if(!items.length){ alert(t('Your cart is empty.','Su carrito está vacío.')); return; }
-      const {sub,tax,del,total}=totals();
-      const payload={
-        lang,timestamp:new Date().toISOString(),business:BUSINESS,
-        customer:{firstName,lastName,idNumber,phone,email,address,gps,city:""},
-        delivery:{minutes:deliveryMinutes,fee:DELIVERY_FEE,included:true,display:(deliveryMinutes===45)?t('45 min','45 min'):(deliveryMinutes===60)?t('1 hr','1 hr'):t('1 hr 30 min','1 hr 30 min')},
-        cart:{items,subtotal:sub,vat:tax,delivery:del,total,instructions}
+      const rawInputs={
+        firstName:$('#firstName').value,
+        lastName:$('#lastName').value,
+        idNumber:$('#idNumber').value,
+        phone:$('#phone').value,
+        email:$('#email').value,
+        address:$('#address').value
       };
+      const cleanedInputs={};
+      Object.entries(rawInputs).forEach(([key,value])=>{
+        cleanedInputs[key]=Checkout.sanitizeString(value);
+      });
+      cleanedInputs.email=cleanedInputs.email.toLowerCase();
+      cleanedInputs.phone=cleanedInputs.phone.replace(/[^+\d]/g,'');
+      const instructionsRaw=$('#instructions').value;
+      const emailOK=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanedInputs.email);
+      const phoneOK=/^\+?593\d{9,10}$/.test(cleanedInputs.phone)||/^0\d{8,9}$/.test(cleanedInputs.phone);
+      if(!cleanedInputs.firstName||!cleanedInputs.lastName||!cleanedInputs.idNumber||!phoneOK||!emailOK||!cleanedInputs.address){
+        alert(t('Please fill all fields with valid data (Name, Last name, Céd/RUC, EC phone, Email, Address).',
+                'Complete todos los campos con datos válidos (Nombre, Apellido, Céd/RUC, teléfono EC, Correo, Dirección).'));
+        return;
+      }
+      const hasItems=PRODUCTS.some(p=>(cart.get(p.id)||0)>0);
+      if(!hasItems){
+        alert(t('Your cart is empty.','Su carrito está vacío.'));
+        return;
+      }
+      const deliveryDisplay=(deliveryMinutes===45)?t('45 min','45 min'):(deliveryMinutes===60)?t('1 hr','1 hr'):t('1 hr 30 min','1 hr 30 min');
+      const payload=Checkout.buildPayload({
+        inputs:cleanedInputs,
+        products:PRODUCTS,
+        cart,
+        totalsFn:totals,
+        lang,
+        business:BUSINESS,
+        delivery:{minutes:deliveryMinutes,fee:DELIVERY_FEE,included:true,display:deliveryDisplay},
+        gps,
+        instructions:instructionsRaw
+      });
       try{
-        if(CLOUDFLARE_WORKER_URL){
-          await fetch(CLOUDFLARE_WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...payload,apps_script_url:APPS_SCRIPT_URL})});
-        }else if(APPS_SCRIPT_URL){
-          await fetch(APPS_SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+        if(CLOUDFLARE_WORKER_URL||APPS_SCRIPT_URL){
+          await Checkout.submitToEndpoints(payload,{cloudflare:CLOUDFLARE_WORKER_URL,appsScript:APPS_SCRIPT_URL});
         }
-      }catch(e){ console.warn("Backend request failed:",e); }
+      }catch(e){
+        console.warn('Backend request failed:',e);
+      }
 
-      const maps=(gps.lat&&gps.lng)?`\nMaps: https://maps.google.com/?q=${gps.lat},${gps.lng}`:"";
-      const lines=items.map(i=>`• ${i.name} x${i.qty} = ${fmt(i.qty*i.unit)}`).join("\n");
-      const msg=`${t('Order','Pedido')} – ${BUSINESS.name}\n\n${t('Customer','Cliente')}: ${firstName} ${lastName}\nID: ${idNumber}\nTel: ${phone}\nEmail: ${email}\nDir: ${address}${maps}\n\n${t('Items Purchased','Artículos')}\n${lines}\n\n${t('Delivery Time','Tiempo de entrega')}: ${payload.delivery.display}\nSubtotal: ${fmt(sub)}\n${t('VAT 15%','IVA 15%')}: ${fmt(tax)}\n${t('Delivery','Entrega')}: ${fmt(del)}\n${t('Total','Total')}: ${fmt(total)}\n\n${t('Instructions','Instrucciones')}: ${instructions||'-'}`;
+      const coords=payload.customer.gps;
+      const maps=(coords.lat&&coords.lng)?`\nMaps: https://maps.google.com/?q=${coords.lat},${coords.lng}`:"";
+      const lines=payload.cart.items.map(i=>`• ${i.name} x${i.qty} = ${fmt(i.qty*i.unit)}`).join("\n");
+      const msg=`${t('Order','Pedido')} – ${BUSINESS.name}\n\n${t('Customer','Cliente')}: ${payload.customer.firstName} ${payload.customer.lastName}\nID: ${payload.customer.idNumber}\nTel: ${payload.customer.phone}\nEmail: ${payload.customer.email}\nDir: ${payload.customer.address}${maps}\n\n${t('Items Purchased','Artículos')}\n${lines}\n\n${t('Delivery Time','Tiempo de entrega')}: ${payload.delivery.display}\nSubtotal: ${fmt(payload.cart.subtotal)}\n${t('VAT 15%','IVA 15%')}: ${fmt(payload.cart.vat)}\n${t('Delivery','Entrega')}: ${fmt(payload.cart.delivery)}\n${t('Total','Total')}: ${fmt(payload.cart.total)}\n\n${t('Instructions','Instrucciones')}: ${payload.cart.instructions||'-'}`;
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,'_blank');
       $('#orderDlg').close();
       alert(t('Order sent. We also opened WhatsApp with the details.','Pedido enviado. También abrimos WhatsApp con los detalles.'));
@@ -647,7 +663,7 @@
     document.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft')scrollByCards(-1); if(e.key==='ArrowRight')scrollByCards(1); });
   </script>
   <footer role="contentinfo">
-    <p><a href="privacy-policy.html">Privacy Policy</a> | <a href="cookie-policy.html">Cookie Policy</a></p>
+    <p><a href="terms-and-conditions.html">Terms &amp; Conditions</a> | <a href="privacy-policy.html">Privacy Policy</a> | <a href="cookie-policy.html">Cookie Policy</a></p>
   </footer>
   <div id="cookieBanner" class="cookie-banner" hidden>
     <p>We use cookies to improve your experience.</p>
@@ -657,7 +673,6 @@
       <button type="button" id="acceptNecessaryCookies">Accept Necessary</button>
     </div>
   </div>
-  <script nonce="2726c7f26c" src="order-collector.js" integrity="sha384-qAmIuVt/AYOF9E04H5d35lpDculHPrKKccwRc8tXOEMVtqFTmQ40XSowFtgUjb45" crossorigin="anonymous" data-check></script>
   <script nonce="2726c7f26c" src="integrity-check.js" integrity="sha384-ivpJrx69d0FkMO7sr+9vbykWyWaKOL3HDkND0fwbXnUOsPcEbVugYSUkPh0hvrPn" crossorigin="anonymous" data-check></script>
 </body>
 </html>
