@@ -1,16 +1,16 @@
-const CACHE_NAME = 'marxia-cache-v4';
+const CACHE_NAME = 'marxia-cache-v5';
 const OFFLINE_URL = 'offline.html';
 const ASSETS = [
   './',
   'index.html',
-  'order-collector.js',
+  'checkout.js',
   'integrity-check.js',
-  'order-worker.js',
   'config.js',
   'sw-register.js',
   'cookie-consent.js',
   'manifest.webmanifest',
   'icon.svg',
+  'terms-and-conditions.html',
   'privacy-policy.html',
   'cookie-policy.html',
   'offline.html'
